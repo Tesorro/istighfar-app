@@ -1,0 +1,15 @@
+{
+  "name": "istighfar",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev:web": "bun run --filter @istighfar/web dev",
+    "dev:api": "bun run --filter @istighfar/api start:dev",
+    "test": "bun run --filter '*' test",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "bun run --filter @istighfar/api db:migrate",
+    "db:deploy": "bun run --filter @istighfar/api db:deploy",
+    "db:generate": "bun run --filter @istighfar/api db:generate"
+  }
+}

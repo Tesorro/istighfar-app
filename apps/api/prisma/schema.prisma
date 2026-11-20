@@ -1,0 +1,81 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  runtime      = "nodejs"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Family {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String
+  targetCount Int          @default(1000000) @map("target_count")
+  timezone    String
+  createdAt   DateTime     @default(now()) @map("created_at")
+  users       User[]
+  invitations Invitation[]
+
+  @@map("families")
+}
+
+model User {
+  id            String          @id @default(uuid()) @db.Uuid
+  name          String
+  email         String          @unique
+  passwordHash  String          @map("password_hash")
+  familyId      String?         @map("family_id") @db.Uuid
+  createdAt     DateTime        @default(now()) @map("created_at")
+  family        Family?         @relation(fields: [familyId], references: [id], onDelete: Restrict)
+  progress      DailyProgress[]
+  refreshTokens RefreshToken[]
+  invitations   Invitation[]
+
+  @@index([familyId])
+  @@map("users")
+}
+
+model DailyProgress {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  date      DateTime @db.Date
+  count     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([date])
+  @@map("daily_progress")
+}
+
+model Invitation {
+  id          String    @id @default(uuid()) @db.Uuid
+  familyId    String    @map("family_id") @db.Uuid
+  tokenHash   String    @unique @map("token_hash")
+  expiresAt   DateTime  @map("expires_at")
+  usedAt      DateTime? @map("used_at")
+  createdById String    @map("created_by_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at")
+  family      Family    @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@map("invitations")
+}
+
+model RefreshToken {
+  id                  String    @id @default(uuid()) @db.Uuid
+  userId              String    @map("user_id") @db.Uuid
+  tokenHash           String    @unique @map("token_hash")
+  expiresAt           DateTime  @map("expires_at")
+  revokedAt           DateTime? @map("revoked_at")
+  replacedByTokenHash String?   @map("replaced_by_token_hash")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}

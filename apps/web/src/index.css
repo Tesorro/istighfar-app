@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Literata", ui-serif, Georgia, serif;
+  --color-canvas: #f3efe6;
+  --color-ink: #1c2b26;
+  --color-card: #fffdf8;
+  --color-primary: #0f6a4e;
+  --color-primary-deep: #0c3f34;
+  --color-gold: #a8843d;
+  --color-gold-soft: #f4e7cb;
+  --color-line: #e4dccf;
+  --color-muted: #5f6d67;
+  --color-danger: #8d3b3b;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    background-image:
+      radial-gradient(circle at 12% 8%, rgb(168 132 61 / 0.14), transparent 28%),
+      radial-gradient(circle at 100% 0%, rgb(15 106 78 / 0.08), transparent 32%);
+    min-height: 100dvh;
+  }
+
+  button,
+  a,
+  input {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+@utility eyebrow {
+  @apply text-xs font-medium tracking-[0.18em] text-gold uppercase;
+}

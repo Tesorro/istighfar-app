@@ -1,0 +1,25 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/istighfar
+            git pull origin main
+            export PATH="$HOME/.bun/bin:$PATH"
+            bun install
+            bun run --filter @istighfar/api build
+            bun run --filter @istighfar/web build
+            systemctl restart istighfar-api
+            systemctl reload nginx

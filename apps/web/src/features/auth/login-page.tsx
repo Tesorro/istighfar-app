@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ApiError } from '@/lib/api';
@@ -27,6 +28,7 @@ export function LoginPage() {
     setError(null);
     try {
       const user = await login({ email: values.email.trim().toLowerCase(), password: values.password });
+      toast.success('Вход выполнен');
       if (user.familyId) {
         navigate('/');
         return;

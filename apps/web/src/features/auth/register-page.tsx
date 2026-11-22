@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { api, ApiError } from '@/lib/api';
@@ -50,7 +51,9 @@ export function RegisterPage() {
       }
       navigate('/setup');
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Не удалось создать учётную запись');
+      const message = caught instanceof ApiError ? caught.message : 'Не удалось создать учётную запись';
+      setError(message);
+      toast.error(message);
     }
   }
 

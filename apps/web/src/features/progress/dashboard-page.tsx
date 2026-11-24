@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import type { ReactNode } from 'react';
+import { RefreshCw } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -43,7 +45,17 @@ export function DashboardPage() {
   return (
     <PageFrame>
       <p className="eyebrow">Вместе</p>
-      <h1 className="mt-2 font-serif text-4xl text-primary-deep">Istighfar</h1>
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <h1 className="font-serif text-4xl text-primary-deep">Istighfar</h1>
+        <RefreshButton
+          onRefresh={async () => {
+            const [nextProgress, nextToday] = await Promise.all([progress.refetch(), today.refetch()]);
+            if (nextProgress.isSuccess && nextToday.isSuccess) {
+              toast.success('Счётчик обновлён');
+            }
+          }}
+        />
+      </div>
       <p className="mt-2 text-muted">Одна цель на двоих. Без сравнения и без спешки.</p>
 
       <Card className="mt-6 p-6">
@@ -96,6 +108,28 @@ function statusText(progress: FamilyProgress, today: TodayProgress) {
 
 function errorText(error: unknown) {
   return error instanceof Error ? error.message : 'Не удалось загрузить прогресс';
+}
+
+function RefreshButton({ onRefresh }: { onRefresh: () => Promise<unknown> }) {
+  const [refreshing, setRefreshing] = useState(false);
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      aria-label="Обновить"
+      title="Обновить"
+      aria-busy={refreshing}
+      className="size-11 shrink-0 border border-line/80 bg-card px-0 text-primary-deep shadow-[0_8px_24px_rgb(28_43_38/0.04)] hover:bg-card"
+      disabled={refreshing}
+      onClick={() => {
+        setRefreshing(true);
+        void onRefresh().finally(() => setRefreshing(false));
+      }}
+    >
+      <RefreshCw aria-hidden="true" size={20} strokeWidth={1.8} className={refreshing ? 'animate-spin' : undefined} />
+    </Button>
+  );
 }
 
 function PageFrame({ children }: { children: ReactNode }) {

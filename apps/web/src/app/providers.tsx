@@ -40,7 +40,7 @@ export function App() {
   return (
     <AppProviders>
       <RouterProvider router={router} />
-      <Toaster theme="light" position="top-right" richColors offset={16} style={toasterStyle} />
+      <Toaster theme="light" position="top-center" richColors offset={16} style={toasterStyle} />
     </AppProviders>
   );
 }
